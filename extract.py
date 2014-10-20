@@ -11,6 +11,8 @@ from imbin import imbin2 as imbin
 import sqlite3
 import scipy
 
+import argparse
+
 def invfourier(image):
     return ifftshift(np.fft.ifftn(image))
 
@@ -26,7 +28,7 @@ def quantize(x):
     del mask
     return x
 
-def extract(imageFile,bar,pixels):
+def extract(imageFile,bar,pixels,abel=True):
     image = misc.imread(imageFile)
     print(image.shape)
 
@@ -40,7 +42,10 @@ def extract(imageFile,bar,pixels):
         return None
 
     q,f = imbin(np.abs(transform))
-    a = invabel(f)
+    if abel:
+        a = invabel(f)
+    else:
+        a = f
 
     print(bar)
     print(pixels)
@@ -58,14 +63,14 @@ def extract(imageFile,bar,pixels):
 
     return (wave[mask],a[mask]*scale)
 
-def plotSample(cur,index):
+def plotSample(cur,index,abel=True):
     cur.execute('SELECT "image","pixels","bar","name" FROM images INNER JOIN samples ON "index" == "sample" WHERE "index" == ?;',(index,))
     rows = cur.fetchall()
     hasPlot = False
     accum = []
-    xs = np.arange(350,750)
+    xs = np.arange(100,1000)
     for i,p,b,n in rows:
-        values = extract(i,b,p)
+        values = extract(i,b,p,abel)
         if values is None:
             continue
         q,a = values
@@ -85,21 +90,31 @@ def plotSample(cur,index):
 
 
 if __name__=="__main__":
+    parser = argparse.ArgumentParser(description='Turn a set of sample images into a spectrum.')
+    parser.add_argument('--noAbel', action='store_false',
+                        help='Skip the Abel correction on the Fourier transform')
+    parser.add_argument('sample', action='store',
+                        help='The index for the sample being examined')
+    parser.add_argument('file', action='store',
+                        help='Where to save the spectrum')
+
+    args = parser.parse_args()
+    print(args)
+
     with sqlite3.connect("samples.db") as con:
         cur = con.cursor()
 
         cur.execute('SELECT "index" FROM samples;')
         indices = cur.fetchall()
 
-        indices = [(7,)]
+        indices = [(args.sample,)]
 
-        values = [plotSample(cur,index[0])
+        values = [plotSample(cur,index[0],args.noAbel)
                  for index in indices]
         values = [v for v in values if v is not None]
 
-        xs = np.arange(350,750)
+        xs = np.arange(100,1000)
         for title,value in values:
-            plt.plot(xs,value,label=title)
-            np.savetxt("Abeled.txt",np.vstack([xs,value]).T)
-        plt.legend()
-        plt.show()
+            np.savetxt(args.file,np.vstack([xs,value]).T)
+        #plt.legend()
+        #plt.show()
