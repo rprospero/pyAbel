@@ -30,7 +30,7 @@ def extract(imageFile,bar,pixels):
     image = misc.imread(imageFile)
     print(image.shape)
 
-    image = quantize(image)
+    #image = quantize(image)
 
     transform = invfourier(image)
 
