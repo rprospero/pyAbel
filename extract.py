@@ -34,6 +34,7 @@ def extract(imageFile,bar,pixels,abel=True):
 
     #image = quantize(image)
 
+    image = np.mean(image,axis=2)
     transform = invfourier(image)
 
     pi = np.pi
