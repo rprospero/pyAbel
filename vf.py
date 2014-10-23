@@ -1,14 +1,17 @@
+#!/usr/bin/python
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import misc
 from scipy.fftpack import ifftshift,fftshift
 from scipy.cluster.vq import kmeans2
+import sqlite3
+from sys import argv
 
 def queryK(image,k):
+    shape = image.shape
     mask = np.where(image==k)
     return float(len(mask[0]))/shape[0]/shape[1]
-
-imageFile = "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.13000X.Parnell.0007.jpg"
 
 def vf(imageFile):
 
@@ -28,17 +31,14 @@ def vf(imageFile):
 
     return ks[-1][1]
 
-images = ["/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.13000X.Parnell.0002.jpg",
-          "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.13000X.Parnell.0003.jpg",
-          "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.13000X.Parnell.0005.jpg",
-          "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.13000X.Parnell.0007.jpg",
-          "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.18500X.Parnell.0001.jpg",
-          "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.18500X.Parnell.0004.jpg",
-          "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.18500X.Parnell.0006.jpg",
-          "/home/me1alw/Science/StructuralColour/MathSlice/Macaw/14-076.80000.0V.18500X.Parnell.0008.jpg"]
+if __name__ == "__main__":
+    index = int(argv[1])
 
-data = np.array([vf(i) for i in images])
-print(data)
-print(np.mean(data))
-print(np.std(data))
+    with sqlite3.connect("samples.db") as con:
+        cur = con.cursor()
+        cur.execute('SELECT "image" FROM images INNER JOIN samples ON "index" == "sample" WHERE "index" == ?;',(index,))
 
+        images = cur.fetchall()
+        data = np.array([vf(i) for (i,) in images])
+    
+        print(str(np.mean(data)) + "±" + str(np.std(data)))
