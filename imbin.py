@@ -52,3 +52,26 @@ def imbin2(image,scale=None):
     x = np.arange(0, np.max(rs))
 
     return (x, values[:len(x)])
+
+if __name__=="__main__":
+    import sys
+    import matplotlib.pyplot as plt
+    from scipy import misc
+
+    image = misc.imread(sys.argv[1],flatten=True)
+    image /= 255
+
+    width = 10000.0 # 10 microns
+
+    radius,radial = imbin(image)
+    radius = np.asarray(radius,dtype=np.float64)
+    #Convert inverse pixels to inverse nm
+    radius *= 1/width
+    plt.plot(1/radius,radial)
+    #plt.xlabel("q (1/nm)",size=24)
+    plt.xlabel("nm",size=24)
+    plt.ylabel("I(q)",size=24)
+    plt.tick_params(axis='both', which='major', labelsize=20)
+    plt.tick_params(axis='both', which='minor', labelsize=18)
+    plt.show()
+    print("Loaded")
