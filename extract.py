@@ -29,12 +29,11 @@ def quantize(x):
     return x
 
 def extract(imageFile,bar,pixels,abel=True):
-    image = misc.imread(imageFile)
+    image = misc.imread(imageFile,flatten=True)
     print(image.shape)
 
     #image = quantize(image)
 
-    image = np.mean(image,axis=2)
     transform = invfourier(image)
 
     pi = np.pi
