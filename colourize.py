@@ -20,14 +20,11 @@ def SpectrumToRGB(q,iq):
     #mask = np.logical_and(q > 300e-9,q<800e-9)
     x = np.arange(300,800,1)
     y = np.interp(x,q[::-1],iq[::-1])
-    plt.plot(x,y)
-    plt.show()
     #spec = np.vstack([2*np.pi/q[mask],np.log(iq[mask]*q[mask]**2)])
     #spec = np.vstack([q[mask],iq[mask]])
     spec = np.vstack([x,y])
     xyz = xyz_from_spectrum(spec.T)
-    print(spec.T[0])
-    return xyz #xyz_normalize(xyz)
+    return rgb_from_xyz(xyz_normalize(xyz))
 
 
 def invfourier(image):
@@ -81,7 +78,19 @@ def extract(imageFile,bar,pixels,abel=True):
     a[a<0] = 0
     #plt.plot(wave[mask],a[mask]*scale*10)
     #plt.show()
-    return SpectrumToRGB(wave[mask],a[mask]*scale*1e9)
+    rgb = SpectrumToRGB(wave[mask],a[mask]*scale*1e9)
+    print(rgb)
+    #temp = np.reshape(image,(image.shape[0],image.shape[1],1))*rgb#*np.reshape(np.array([1,1,1]),(1,1,3))
+    r = image * rgb[0]
+    g = image * rgb[1]
+    b = image * rgb[2]
+    temp = np.dstack([r,g,b])
+    print(np.min(image))
+    print(np.max(image))
+    print(np.min(temp))
+    print(np.max(temp))
+    print("max")
+    return np.asarray(temp,dtype=np.uint8)
 
 def plotSample(cur,index,abel=True):
     print(index)
@@ -90,13 +99,17 @@ def plotSample(cur,index,abel=True):
     hasPlot = False
     accum = []
     xs = np.arange(100,1000)
+    vs = []
     for i,p,b,n in rows:
         values = extract(i,b,p,abel)
         if values is None:
             continue
-        print("Colour")
-        print(values)
-    plt.show()
+        vs.append(values)
+        plt.imshow(values)
+        plt.show()
+    #vs = np.reshape(vs,(-1,1,3))
+    #plt.imshow(vs)
+    #plt.show()
 
 
 if __name__=="__main__":
