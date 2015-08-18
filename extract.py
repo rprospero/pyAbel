@@ -87,6 +87,8 @@ if __name__ == "__main__":
     parser.add_argument('--noAbel', action='store_false',
                         help='Skip the Abel correction'
                              ' on the Fourier transform')
+    parser.add_argument('--spread', action='store_true',
+                        help='Plot each image individually')
     parser.add_argument('sample', action='store',
                         help='The index for the sample being examined')
     parser.add_argument('file', action='store',
@@ -106,10 +108,19 @@ if __name__ == "__main__":
         rows = cur.fetchall()
 
         values = []
-        temp = plotSample(rows, args.noAbel)
-        if temp is not None:
-            values.append(temp)
+
+        if args.spread:
+            rows = [[r] for r in rows]
+        else:
+            rows = [rows]
+
+        for rowset in rows:
+            print("-------------------------")
+            print(rowset)
+            temp = plotSample(rowset, args.noAbel)
+            if temp is not None:
+                values.append(temp[1])
 
         xs = np.arange(100, 1000)
-        for title, value in values:
-            np.savetxt(args.file, np.vstack([xs, value]).T)
+        print(map(lambda x: x.shape, [xs] + values))
+        np.savetxt(args.file, np.vstack([xs] + values).T)
