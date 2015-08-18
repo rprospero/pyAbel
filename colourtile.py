@@ -74,21 +74,21 @@ def extract(image,bar,pixels,abel=True):
     #plt.plot(wave[mask],a[mask]*scale*10)
     #plt.show()
     rgb = SpectrumToRGB(wave[mask],a[mask]*scale*1e9)
-    print(rgb)
+    # print(rgb)
     #temp = np.reshape(image,(image.shape[0],image.shape[1],1))*rgb#*np.reshape(np.array([1,1,1]),(1,1,3))
     r = image * rgb[0]
     g = image * rgb[1]
     b = image * rgb[2]
     temp = np.dstack([r,g,b])
-    print(np.min(image))
-    print(np.max(image))
-    print(np.min(temp))
-    print(np.max(temp))
-    print("max")
+    # print(np.min(image))
+    # print(np.max(image))
+    # print(np.min(temp))
+    # print(np.max(temp))
+    # print("max")
     return np.asarray(temp,dtype=np.uint8)
 
 def plotSample(cur,index,abel=True):
-    print(index)
+    # print(index)
     subs = 9
     cur.execute('SELECT "image","pixels","bar","name" FROM images INNER JOIN samples ON "index" == "sample" WHERE "index" == ?;',(index,))
     rows = cur.fetchall()
@@ -102,13 +102,13 @@ def plotSample(cur,index,abel=True):
         resize = shape[0]-shape[0]%subs
         image = image[0:resize,
                       0:resize]
-        print(shape,shape[0],shape[0]%subs,resize)
+        # print(shape,shape[0],shape[0]%subs,resize)
         hs = []
         for h in np.hsplit(image,subs):
-            print(len(h))
+            # print(len(h))
             tiles = []
             for tile in np.vsplit(h,subs):
-                print("tile",tile.shape)
+                # print("tile",tile.shape)
                 values = extract(tile,b,p,abel)
                 if values is None:
                     print("No Values!")
@@ -118,6 +118,7 @@ def plotSample(cur,index,abel=True):
         result = np.hstack(hs)
         vs.append(result)
         plt.imshow(result)
+        print(i)
         plt.show()
     #vs = np.reshape(vs,(-1,1,3))
     #plt.imshow(vs)
