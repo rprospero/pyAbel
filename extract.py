@@ -62,11 +62,7 @@ def extract(imageFile, bar, pixels, abel=True):
     return (wave[mask], a[mask]*scale)
 
 
-def plotSample(cur, index, abel=True):
-    cur.execute('SELECT "image","pixels","bar","name"'
-                'FROM images INNER JOIN samples ON "index" '
-                '== "sample" WHERE "index" == ?;', (index, ))
-    rows = cur.fetchall()
+def plotSample(rows, abel=True):
     hasPlot = False
     accum = []
     xs = np.arange(100, 1000)
@@ -103,13 +99,16 @@ if __name__ == "__main__":
         cur = con.cursor()
 
         cur.execute('SELECT "index" FROM samples;')
-        indices = cur.fetchall()
 
-        indices = [(args.sample,)]
+        cur.execute('SELECT "image","pixels","bar","name"'
+                    'FROM images INNER JOIN samples ON "index" '
+                    '== "sample" WHERE "index" == ?;', (args.sample,))
+        rows = cur.fetchall()
 
-        values = [plotSample(cur, index[0], args.noAbel)
-                  for index in indices]
-        values = [v for v in values if v is not None]
+        values = []
+        temp = plotSample(rows, args.noAbel)
+        if temp is not None:
+            values.append(temp)
 
         xs = np.arange(100, 1000)
         for title, value in values:
