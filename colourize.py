@@ -58,13 +58,13 @@ def extract(imageFile,bar,pixels,abel=True):
     else:
         a = f
 
-    print(bar)
-    print(pixels)
+    # print(bar)
+    # print(pixels)
     scale = bar/pixels
 
-    print(scale)
-    print(size)
-    print(scale*size)
+    # print(scale)
+    # print(size)
+    # print(scale*size)
     index = 1.54
     fraction = 0.0
     index = 1 + fraction * (index-1)
@@ -79,17 +79,17 @@ def extract(imageFile,bar,pixels,abel=True):
     #plt.plot(wave[mask],a[mask]*scale*10)
     #plt.show()
     rgb = SpectrumToRGB(wave[mask],a[mask]*scale*1e9)
-    print(rgb)
+    # print(rgb)
     #temp = np.reshape(image,(image.shape[0],image.shape[1],1))*rgb#*np.reshape(np.array([1,1,1]),(1,1,3))
     r = image * rgb[0]
     g = image * rgb[1]
     b = image * rgb[2]
     temp = np.dstack([r,g,b])
-    print(np.min(image))
-    print(np.max(image))
-    print(np.min(temp))
-    print(np.max(temp))
-    print("max")
+    # print(np.min(image))
+    # print(np.max(image))
+    # print(np.min(temp))
+    # print(np.max(temp))
+    # print("max")
     return np.asarray(temp,dtype=np.uint8)
 
 def plotSample(cur,index,abel=True):
@@ -102,6 +102,7 @@ def plotSample(cur,index,abel=True):
     vs = []
     for i,p,b,n in rows:
         values = extract(i,b,p,abel)
+        print(i)
         if values is None:
             continue
         vs.append(values)
