@@ -5,3 +5,6 @@
 *.txt
 samples.db
 *.pdf
+*.pyc
+*.dat
+*.mp4
