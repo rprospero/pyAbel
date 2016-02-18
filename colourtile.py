@@ -117,7 +117,8 @@ def plotSample(cur,index,abel=True):
             hs.append(np.vstack(tiles))
         result = np.hstack(hs)
         vs.append(result)
-        plt.imshow(result)
+        plt.imshow(result, extent=[0, result.shape[0]*b/p/1000,
+                                   0, result.shape[1]*b/p/1000])
         print(i)
         plt.show()
     #vs = np.reshape(vs,(-1,1,3))
